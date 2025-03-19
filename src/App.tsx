@@ -26,7 +26,7 @@ function App() {
       .map((n) => n.trim())
       .filter((n) => n.length > 5);
     const total = numberList.length;
-    const { token, phoneNumberId, templateId } = values;
+    const { token, phoneNumberId, templateId, imageUrl } = values;
     setOpenModal(true);
 
     for (const number of numberList) {
@@ -36,6 +36,7 @@ function App() {
           token,
           templateId,
           phoneNumberId,
+          imageUrl,
         });
         setTriggerState((state) => ({
           ...state,
