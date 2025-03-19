@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formSchema } from "@/schemas/templateFormSchema";
+import { useState } from "react"; // Import necessário para o estado
 
 const TemplateForm = ({
   onSubmit,
@@ -27,12 +28,17 @@ const TemplateForm = ({
       phoneNumberId: "",
       templateId: "",
       base: "",
+      imageUrl: "", // Adicionando o campo no estado inicial
     },
   });
+
+  const [isAdditionalParamsVisible, setAdditionalParamsVisible] =
+    useState(false);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Campos existentes */}
         <FormField
           control={form.control}
           name="token"
@@ -106,6 +112,42 @@ const TemplateForm = ({
             </FormItem>
           )}
         />
+
+        {/* Seção expansível */}
+        <div>
+          <Button
+            onClick={() =>
+              setAdditionalParamsVisible(!isAdditionalParamsVisible)
+            }
+          >
+            {isAdditionalParamsVisible ? "Recolher" : "Expandir"} Parâmetros
+            adicionais
+          </Button>
+          {isAdditionalParamsVisible && (
+            <div className="mt-4 space-y-4">
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Url de imagem do header</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://example.com/image.jpg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      URL de uma imagem que será usada no header do template.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+        </div>
+
         <Button type="submit">Enviar</Button>
       </form>
     </Form>

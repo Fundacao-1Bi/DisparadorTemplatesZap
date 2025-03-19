@@ -5,11 +5,13 @@ const sendToMeta = async ({
   token,
   templateId,
   phoneNumberId,
+  imageUrl,
 }: {
   number: string;
   token: string;
   templateId: string;
   phoneNumberId: string;
+  imageUrl?: string;
 }) => {
   const config = {
     headers: {
@@ -17,7 +19,23 @@ const sendToMeta = async ({
     },
   };
 
-  const data = {
+  const data: {
+    messaging_product: string;
+    to: string;
+    type: string;
+    preview_url: boolean;
+    template: {
+      name: string;
+      language: { code: string };
+      components?: Array<{
+        type: string;
+        parameters: Array<{
+          type: string;
+          image: { link: string };
+        }>;
+      }>;
+    };
+  } = {
     messaging_product: "whatsapp",
     to: number,
     type: "template",
@@ -25,21 +43,23 @@ const sendToMeta = async ({
     template: {
       name: templateId,
       language: { code: "pt_BR" },
-      //   components: [
-      //     {
-      //       type: "header",
-      //       parameters: [
-      //         {
-      //           type: "image",
-      //           image: {
-      //             link: url,
-      //           },
-      //         },
-      //       ],
-      //     },
-      //   ],
     },
   };
+  if (imageUrl) {
+    data.template.components = [
+      {
+        type: "header",
+        parameters: [
+          {
+            type: "image",
+            image: {
+              link: imageUrl,
+            },
+          },
+        ],
+      },
+    ];
+  }
   const response = await axios.post(
     `https://graph.facebook.com/v19.0/${phoneNumberId}/messages`,
     data,
