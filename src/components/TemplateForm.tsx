@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,15 +29,33 @@ const TemplateForm = ({
       phoneNumberId: "",
       templateId: "",
       base: "",
-      imageUrl: "", // Adicionando o campo no estado inicial
+      imageUrl: "",
       hasFlowTemplate: false,
-      flowToken: "flow_token",
+      flowButtons: [],
     },
   });
 
   const [isAdditionalParamsVisible, setAdditionalParamsVisible] =
     useState(false);
   const hasFlowTemplate = form.watch("hasFlowTemplate");
+
+  const { fields, append, remove, replace } = useFieldArray({
+    control: form.control,
+    name: "flowButtons",
+  });
+
+  const handleButtonCountChange = (newCount: number) => {
+    const currentCount = fields.length;
+    if (newCount > currentCount) {
+      for (let i = currentCount; i < newCount; i++) {
+        append({ order: i + 1, flowToken: "" });
+      }
+    } else if (newCount < currentCount) {
+      for (let i = currentCount - 1; i >= newCount; i--) {
+        remove(i);
+      }
+    }
+  };
 
   return (
     <Form {...form}>
@@ -161,9 +179,14 @@ const TemplateForm = ({
                           ref={field.ref}
                           type="checkbox"
                           checked={field.value}
-                          onChange={(event) =>
-                            field.onChange(event.target.checked)
-                          }
+                          onChange={(event) => {
+                            field.onChange(event.target.checked);
+                            if (event.target.checked) {
+                              replace([{ order: 1, flowToken: "flow_token" }]);
+                            } else {
+                              replace([]);
+                            }
+                          }}
                           className="h-4 w-4 rounded border border-input"
                         />
                       </FormControl>
@@ -182,23 +205,60 @@ const TemplateForm = ({
                 )}
               />
               {hasFlowTemplate && (
-                <FormField
-                  control={form.control}
-                  name="flowToken"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Flow Token</FormLabel>
-                      <FormControl>
-                        <Input placeholder="teste123" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Token enviado em
-                        template.components[0].parameters[0].action.flow_token.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Label htmlFor="flowButtonCount">Botões com flow</Label>
+                    <input
+                      id="flowButtonCount"
+                      type="number"
+                      min={1}
+                      value={fields.length}
+                      onChange={(e) =>
+                        handleButtonCountChange(
+                          Math.max(1, parseInt(e.target.value) || 1),
+                        )
+                      }
+                      className="h-9 w-20 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                    />
+                  </div>
+                  {fields.map((fieldItem, index) => (
+                    <div key={fieldItem.id} className="flex items-end gap-3">
+                      <FormField
+                        control={form.control}
+                        name={`flowButtons.${index}.order`}
+                        render={({ field }) => (
+                          <FormItem className="w-28">
+                            <FormLabel>Ordem</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={1}
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 1)
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`flowButtons.${index}.flowToken`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel>Flow Token</FormLabel>
+                            <FormControl>
+                              <Input placeholder="flow_token" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           )}

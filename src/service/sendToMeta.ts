@@ -6,16 +6,14 @@ const sendToMeta = async ({
   templateId,
   phoneNumberId,
   imageUrl,
-  hasFlowTemplate,
-  flowToken,
+  flowButtons,
 }: {
   number: string;
   token: string;
   templateId: string;
   phoneNumberId: string;
   imageUrl?: string;
-  hasFlowTemplate?: boolean;
-  flowToken?: string;
+  flowButtons?: Array<{ order: number; flowToken: string }>;
 }) => {
   const config = {
     headers: {
@@ -34,7 +32,7 @@ const sendToMeta = async ({
     | {
         type: "button";
         sub_type: "flow";
-        index: "0";
+        index: string;
         parameters: Array<{
           type: "action";
           action: { flow_token: string };
@@ -77,20 +75,22 @@ const sendToMeta = async ({
     });
   }
 
-  if (hasFlowTemplate && flowToken) {
-    templateComponents.push({
-      type: "button",
-      sub_type: "flow",
-      index: "0",
-      parameters: [
-        {
-          type: "action",
-          action: {
-            flow_token: flowToken,
+  if (flowButtons && flowButtons.length > 0) {
+    for (const btn of flowButtons) {
+      templateComponents.push({
+        type: "button",
+        sub_type: "flow",
+        index: String(btn.order - 1),
+        parameters: [
+          {
+            type: "action",
+            action: {
+              flow_token: btn.flowToken,
+            },
           },
-        },
-      ],
-    });
+        ],
+      });
+    }
   }
 
   if (templateComponents.length > 0) {

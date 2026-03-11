@@ -39,20 +39,37 @@ export const formSchema = z
       })
       .optional(),
     hasFlowTemplate: z.boolean().default(false),
-    flowToken: z
-      .string()
-      .max(2000, {
-        message: "O flow token deve ter no máximo 2000 caracteres.",
-      })
+    flowButtons: z
+      .array(
+        z.object({
+          order: z
+            .number()
+            .min(1, { message: "A ordem deve ser no mínimo 1." }),
+          flowToken: z.string().max(2000, {
+            message: "O flow token deve ter no máximo 2000 caracteres.",
+          }),
+        }),
+      )
       .optional(),
   })
-  .superRefine(({ hasFlowTemplate, flowToken }, ctx) => {
-    if (hasFlowTemplate && !flowToken?.trim()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["flowToken"],
-        message:
-          "O flow token é obrigatório quando o template com flow está ativo.",
+  .superRefine(({ hasFlowTemplate, flowButtons }, ctx) => {
+    if (hasFlowTemplate) {
+      if (!flowButtons || flowButtons.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["flowButtons"],
+          message: "Adicione ao menos um botão com flow.",
+        });
+        return;
+      }
+      flowButtons.forEach((btn, i) => {
+        if (!btn.flowToken?.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["flowButtons", i, "flowToken"],
+            message: "O flow token é obrigatório.",
+          });
+        }
       });
     }
   });
