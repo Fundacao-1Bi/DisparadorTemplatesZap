@@ -17,12 +17,15 @@ import { formSchema } from "@/schemas/templateFormSchema";
 import { useState } from "react"; // Import necessário para o estado
 import { Label } from "@/components/ui/label";
 
+type TemplateFormInput = z.input<typeof formSchema>;
+type TemplateFormValues = z.output<typeof formSchema>;
+
 const TemplateForm = ({
   onSubmit,
 }: {
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  onSubmit: (values: TemplateFormValues) => void;
 }) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<TemplateFormInput, unknown, TemplateFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       token: "",
@@ -178,7 +181,7 @@ const TemplateForm = ({
                           id="hasFlowTemplate"
                           ref={field.ref}
                           type="checkbox"
-                          checked={field.value}
+                          checked={field.value ?? false}
                           onChange={(event) => {
                             field.onChange(event.target.checked);
                             if (event.target.checked) {
