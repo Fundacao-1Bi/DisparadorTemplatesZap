@@ -42,9 +42,6 @@ export const formSchema = z
     flowButtons: z
       .array(
         z.object({
-          order: z
-            .number()
-            .min(1, { message: "A ordem deve ser no mínimo 1." }),
           flowToken: z.string().max(2000, {
             message: "O flow token deve ter no máximo 2000 caracteres.",
           }),
@@ -61,6 +58,13 @@ export const formSchema = z
           message: "Adicione ao menos um botão com flow.",
         });
         return;
+      }
+      if (flowButtons.length > 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["flowButtons"],
+          message: "Use apenas o botão de flow no índice padrão.",
+        });
       }
       flowButtons.forEach((btn, i) => {
         if (!btn.flowToken?.trim()) {
