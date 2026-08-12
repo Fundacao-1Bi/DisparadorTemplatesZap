@@ -17,8 +17,7 @@ jobs:
   validate:
     name: Lint and build
     if: github.event_name != 'pull_request' || github.head_ref != 'develop'
-    runs-on:
-      - codebuild-azp-gha-linux-medium-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Checkout
