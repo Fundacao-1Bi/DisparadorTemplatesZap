@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export const META_GRAPH_API_VERSION = "v26.0";
+
 const sendToMeta = async ({
   number,
   token,
@@ -98,7 +100,7 @@ const sendToMeta = async ({
   }
 
   const response = await axios.post(
-    `https://graph.facebook.com/v24.0/${phoneNumberId}/messages`,
+    `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${phoneNumberId}/messages`,
     data,
     config,
   );
