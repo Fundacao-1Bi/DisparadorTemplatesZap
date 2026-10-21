@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "rootDir": "src/service",
+    "outDir": ".test-build"
+  },
+  "include": ["src/service/sendToMeta.ts"]
+}
