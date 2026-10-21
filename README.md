@@ -1,5 +1,18 @@
 # React + TypeScript + Vite
 
+## WhatsApp Graph API
+
+O envio de templates usa explicitamente a Graph API `v26.0`, definida em
+`src/service/sendToMeta.ts`. O formulário recebe telefones no formato internacional;
+esses destinatários continuam no campo `to`. Esta aplicação não recebe webhooks nem
+resolve identidades BSUID.
+
+Execute `npm ci`, `npm test`, `npm run lint` e `npm run build` para validar a alteração.
+Os testes usam o adapter do Axios sem acesso à rede e verificam o endpoint, os headers,
+templates em português, imagens, botões Flow e a propagação de erros. Uma resposta de
+aceitação do envio não comprova a entrega da mensagem. Envio e entrega reais devem ser
+validados separadamente em homologação antes de promover uma versão.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
