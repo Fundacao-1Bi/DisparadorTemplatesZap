@@ -7,11 +7,9 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "09:00"
+      time: "12:45"
       timezone: "America/Sao_Paulo"
     open-pull-requests-limit: 5
-    reviewers:
-      - "Fundacao-1Bi/aprendizap-core"
     labels:
       - "dependencies"
       - "npm"
